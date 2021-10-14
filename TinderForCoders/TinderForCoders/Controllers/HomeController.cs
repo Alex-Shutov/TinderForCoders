@@ -33,7 +33,7 @@ namespace TinderForCoders.Controllers
         }
 
         [Authorize]
-        public IActionResult Authorization()
+        public IActionResult PrivateSpace()
         {
             return View();
         }
@@ -57,6 +57,7 @@ namespace TinderForCoders.Controllers
                 var claims = new List<Claim>
                 {
                     new("username", username),
+                    new(ClaimTypes.Name, username),
                     new(ClaimTypes.NameIdentifier, username)
                 };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -71,6 +72,13 @@ namespace TinderForCoders.Controllers
             return View("login");
         }
 
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+
+            return Redirect("/");
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
