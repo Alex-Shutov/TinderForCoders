@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using TinderForCoders.Models;
 
 namespace TinderForCoders.Controllers
@@ -23,6 +24,17 @@ namespace TinderForCoders.Controllers
             return View();
         }
 
+        [Authorize]
+        public IActionResult PrivateContent()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+
+            return Content("не аутентифицирован");
+        }
+
         public IActionResult Privacy()
         {
             return View();
@@ -31,7 +43,7 @@ namespace TinderForCoders.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }
 }
