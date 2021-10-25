@@ -16,8 +16,11 @@ namespace TinderForCoders
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private string contentRoot = "";
+        [Obsolete]
+        public Startup(IConfiguration configuration, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
+            contentRoot = env.ContentRootPath;
             Configuration = configuration;
         }
 
@@ -27,8 +30,12 @@ namespace TinderForCoders
         public void ConfigureServices(IServiceCollection services)
         {
             var connection = Configuration.GetConnectionString("DefaultConnection");
+            if (connection.Contains("%CONTENTROOT%"))
+            {
+                connection = connection.Replace("%CONTENTROOT%", contentRoot);
+            }
 
-            services.AddDbContext<UserContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<MainDataBase>(options => options.UseSqlServer(connection));
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));

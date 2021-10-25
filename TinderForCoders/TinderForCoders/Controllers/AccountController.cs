@@ -11,9 +11,9 @@ namespace TinderForCoders.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserContext db;
+        private readonly MainDataBase db;
 
-        public AccountController(UserContext context)
+        public AccountController(MainDataBase context)
         {
             db = context;
         }
@@ -30,8 +30,8 @@ namespace TinderForCoders.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await db.Users
-                    .FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+                var user = await db.UserTables
+                    .FirstOrDefaultAsync(u => u.UserEmail == model.Email && u.UserPassword == model.Password);
 
                 if (user != null)
                 {
@@ -57,22 +57,28 @@ namespace TinderForCoders.Controllers
         public async Task<IActionResult> Register(RegisterModel model)
         {
             if (ModelState.IsValid)
-            {
-                var user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+                {
+                var user = await db.UserTables.FirstOrDefaultAsync(u => u.UserEmail == model.Email);
                 if (user == null)
                 {
                     // добавляем пользователя в бд
-                    db.Users.Add(new User {Email = model.Email, Password = model.Password});
+                    db.UserTables.Add(new UserTable { UserEmail = model.Email,
+                        UserPassword = model.Password,
+                        UserGit=model.GithubPage,
+                        UserLogin=model.Login,
+                        UserName=model.Name,
+                        UserSurname=model.SurName});
                     await db.SaveChangesAsync();
 
                     await Authenticate(model.Email); // аутентификация
 
                     return RedirectToAction("Index", "Home");
                 }
-
+            }
+            else 
+            {
                 ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             }
-
             return View(model);
         }
 
